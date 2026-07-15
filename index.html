@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JRS · Java Review Swarm — Java code review with adversarial verification</title>
+<meta name="description" content="Multi-perspective Java code review with adversarial verification. Eight specialist reviewers, every finding cross-examined against the real code before you see it. Verified findings only.">
+<style>
+  :root {
+    --paper:      #eef1f6;
+    --surface:    #fbfcfe;
+    --sunken:     #e7ebf2;
+    --ink:        #16222f;
+    --ink-soft:   #4a5a6d;
+    --ink-faint:  #7d8b9c;
+    --line:       #d3dae4;
+    --line-soft:  #e1e6ee;
+    --accent:     #1d4e89;
+    --accent-2:   #2c6db5;
+    --crit:       #c8384a;
+    --high:       #b85c1c;
+    --med:        #9a7412;
+    --good:       #2c7a52;
+    --shadow:     0 1px 2px rgba(20,34,48,.04), 0 12px 32px -12px rgba(20,34,48,.14);
+
+    --font-mono: ui-monospace, "SF Mono", "SFMono-Regular", "Menlo", "Consolas", "Liberation Mono", monospace;
+    --font-serif: "Iowan Old Style", "Charter", "Bitstream Charter", "Georgia", "Times New Roman", serif;
+
+    --measure: 62ch;
+    --edge: clamp(1.15rem, 5vw, 4rem);
+    --maxw: 1120px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:      #0e1621;
+      --surface:    #16212e;
+      --sunken:     #0a1119;
+      --ink:        #e7edf4;
+      --ink-soft:   #9fb0c2;
+      --ink-faint:  #6b7d90;
+      --line:       #26374a;
+      --line-soft:  #1d2c3c;
+      --accent:     #5fa0dc;
+      --accent-2:   #7db6ea;
+      --crit:       #ef6b76;
+      --high:       #e2894a;
+      --med:        #d8b24f;
+      --good:       #57b783;
+      --shadow:     0 1px 2px rgba(0,0,0,.25), 0 18px 44px -16px rgba(0,0,0,.55);
+    }
+  }
+
+  /* Explicit toggle wins over the OS media query, in both directions. */
+  :root[data-theme="light"] {
+    --paper:#eef1f6; --surface:#fbfcfe; --sunken:#e7ebf2; --ink:#16222f;
+    --ink-soft:#4a5a6d; --ink-faint:#7d8b9c; --line:#d3dae4; --line-soft:#e1e6ee;
+    --accent:#1d4e89; --accent-2:#2c6db5; --crit:#c8384a; --high:#b85c1c;
+    --med:#9a7412; --good:#2c7a52;
+    --shadow:0 1px 2px rgba(20,34,48,.04), 0 12px 32px -12px rgba(20,34,48,.14);
+  }
+  :root[data-theme="dark"] {
+    --paper:#0e1621; --surface:#16212e; --sunken:#0a1119; --ink:#e7edf4;
+    --ink-soft:#9fb0c2; --ink-faint:#6b7d90; --line:#26374a; --line-soft:#1d2c3c;
+    --accent:#5fa0dc; --accent-2:#7db6ea; --crit:#ef6b76; --high:#e2894a;
+    --med:#d8b24f; --good:#57b783;
+    --shadow:0 1px 2px rgba(0,0,0,.25), 0 18px 44px -16px rgba(0,0,0,.55);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .wrap { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--edge); }
+
+  a { color: var(--accent); text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent); text-underline-offset: 3px; }
+  a:hover { color: var(--accent-2); }
+  :focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; border-radius: 2px; }
+
+  .mono { font-family: var(--font-mono); }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 1.1rem;
+    font-weight: 600;
+  }
+  h1, h2, h3 { font-family: var(--font-mono); font-weight: 700; text-wrap: balance; letter-spacing: -.02em; }
+
+  /* ---------- header ---------- */
+  header.top {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--paper) 86%, transparent);
+    backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: 60px; }
+  .brand { font-family: var(--font-mono); font-weight: 700; font-size: 1.02rem; letter-spacing: -.02em; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: .5ch; }
+  .brand .tick { color: var(--accent); }
+  .brand:hover { color: var(--ink); }
+  nav.links { display: flex; align-items: center; gap: 1.6rem; }
+  nav.links a { font-family: var(--font-mono); font-size: .82rem; color: var(--ink-soft); text-decoration: none; }
+  nav.links a:hover { color: var(--accent); }
+  @media (max-width: 720px) { nav.links a.hide-sm { display: none; } }
+  .toggle {
+    font-family: var(--font-mono); font-size: .74rem; letter-spacing: .04em;
+    color: var(--ink-soft); background: transparent; border: 1px solid var(--line);
+    padding: .38rem .6rem; border-radius: 6px; cursor: pointer; line-height: 1;
+  }
+  .toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- section scaffolding ---------- */
+  section { border-top: 1px solid var(--line-soft); }
+  section:first-of-type { border-top: 0; }
+  .pad { padding-block: clamp(3.2rem, 7vw, 5.8rem); }
+  .lede { max-width: var(--measure); color: var(--ink-soft); font-size: 1.14rem; }
+  h2.sec { font-size: clamp(1.5rem, 3.2vw, 2.15rem); margin: 0 0 1rem; line-height: 1.12; }
+
+  /* ---------- hero ---------- */
+  .hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(1.5rem, 4vw, 3.4rem); align-items: center; }
+  @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+  .hero h1 { font-size: clamp(2.15rem, 5.4vw, 3.55rem); line-height: 1.04; margin: 0 0 1.3rem; }
+  .hero .deck { max-width: 40ch; color: var(--ink-soft); font-size: 1.16rem; margin: 0 0 1.9rem; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: .8rem; margin-bottom: 1.25rem; }
+  .btn {
+    font-family: var(--font-mono); font-size: .9rem; font-weight: 600; letter-spacing: -.01em;
+    display: inline-flex; align-items: center; gap: .55ch;
+    padding: .8rem 1.15rem; border-radius: 8px; text-decoration: none; cursor: pointer;
+    border: 1px solid transparent; transition: transform .12s ease, background .18s ease, border-color .18s ease;
+  }
+  .btn.primary { background: var(--accent); color: #fff; }
+  @media (prefers-color-scheme: dark) { .btn.primary { color: #08121c; } }
+  :root[data-theme="dark"] .btn.primary { color: #08121c; }
+  :root[data-theme="light"] .btn.primary { color: #fff; }
+  .btn.primary:hover { background: var(--accent-2); transform: translateY(-1px); }
+  .btn.ghost { border-color: var(--line); color: var(--ink); background: var(--surface); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+  .fine { font-family: var(--font-mono); font-size: .76rem; color: var(--ink-faint); letter-spacing: .01em; }
+
+  /* ---------- output card ---------- */
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; box-shadow: var(--shadow); overflow: hidden;
+  }
+  .card .bar { display: flex; align-items: center; gap: .5ch; padding: .7rem .95rem; border-bottom: 1px solid var(--line-soft); background: var(--sunken); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+  .card .bar .cmd { font-family: var(--font-mono); font-size: .78rem; color: var(--ink-faint); margin-left: .4ch; }
+  .card .body { padding: 1.05rem 1.1rem 1.2rem; font-family: var(--font-mono); font-size: .83rem; line-height: 1.5; overflow-x: auto; }
+  .verdict { font-weight: 700; font-size: .96rem; letter-spacing: -.01em; }
+  .verdict.concern { color: var(--med); }
+  .subtle { color: var(--ink-faint); }
+  .finding { padding: .7rem 0; border-top: 1px dashed var(--line); }
+  .finding:first-of-type { border-top: 0; }
+  .chip { display: inline-block; font-size: .68rem; font-weight: 700; letter-spacing: .06em; padding: .12em .5em; border-radius: 4px; border: 1px solid currentColor; }
+  .chip.med { color: var(--med); }
+  .chip.ref { color: var(--ink-faint); }
+  .slug { color: var(--ink-soft); }
+  .fbody { color: var(--ink); margin-top: .35rem; white-space: normal; }
+  .refuted .fttl { text-decoration: line-through; color: var(--ink-faint); }
+  .vnote { color: var(--good); }
+  .refuted .vnote { color: var(--ink-soft); }
+  .kill { color: var(--crit); }
+
+  /* ---------- pillars ---------- */
+  .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.2rem, 3vw, 2.4rem); margin-top: 2.4rem; }
+  @media (max-width: 820px) { .cols3 { grid-template-columns: 1fr; gap: 1.7rem; } }
+  .pillar h3 { font-size: 1.06rem; margin: 0 0 .5rem; color: var(--ink); letter-spacing: -.01em; }
+  .pillar .n { font-family: var(--font-mono); font-size: .74rem; color: var(--accent); letter-spacing: .12em; display: block; margin-bottom: .7rem; }
+  .pillar p { margin: 0; color: var(--ink-soft); font-size: .98rem; }
+
+  /* ---------- evidence ---------- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 2.4rem 0 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+  @media (max-width: 820px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px) { .stats { grid-template-columns: 1fr; } }
+  .stat { padding: 1.4rem 1.3rem; border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); }
+  .stat .num { font-family: var(--font-mono); font-weight: 700; font-size: clamp(1.9rem, 4vw, 2.7rem); line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .stat .num .unit { font-size: .9rem; color: var(--ink-faint); letter-spacing: 0; }
+  .stat .lab { font-family: var(--font-mono); font-size: .74rem; color: var(--ink-soft); margin-top: .6rem; line-height: 1.4; }
+  .stat .num.good { color: var(--good); }
+  .callout {
+    margin-top: 1.6rem; border-left: 3px solid var(--accent);
+    background: var(--sunken); border-radius: 0 8px 8px 0;
+    padding: 1.05rem 1.25rem; color: var(--ink-soft); font-size: 1.02rem;
+    max-width: 74ch;
+  }
+  .callout strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- pipeline ---------- */
+  .pipe { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 2.5rem; }
+  @media (max-width: 820px) { .pipe { grid-template-columns: 1fr; } }
+  .stage { position: relative; padding: 1.5rem 1.6rem 1.6rem 0; border-top: 2px solid var(--accent); margin-right: 1.4rem; }
+  @media (max-width: 820px) { .stage { border-top: 0; border-left: 2px solid var(--accent); padding: .2rem 0 1.6rem 1.4rem; margin-right: 0; } }
+  .stage .step { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em; color: var(--accent); font-weight: 700; }
+  .stage h3 { font-size: 1rem; margin: .5rem 0 .5rem; letter-spacing: -.01em; }
+  .stage p { margin: 0; color: var(--ink-soft); font-size: .92rem; }
+
+  /* ---------- why / list ---------- */
+  .why { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.4rem,3vw,2.8rem); margin-top: 2.2rem; }
+  @media (max-width: 820px) { .why { grid-template-columns: 1fr; } }
+  .why .item { padding-left: 1.2rem; border-left: 2px solid var(--line); }
+  .why .item h3 { font-size: 1.02rem; margin: 0 0 .45rem; color: var(--ink); }
+  .why .item p { margin: 0; color: var(--ink-soft); font-size: .98rem; }
+
+  /* ---------- pricing ---------- */
+  .tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; margin-top: 2.3rem; }
+  @media (max-width: 720px) { .tiers { grid-template-columns: 1fr; } }
+  .tier { border: 1px solid var(--line); border-radius: 12px; padding: 1.7rem 1.6rem; background: var(--surface); display: flex; flex-direction: column; }
+  .tier.feat { border-color: var(--accent); box-shadow: var(--shadow); }
+  .tier .kind { font-family: var(--font-mono); font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
+  .tier .price { font-family: var(--font-mono); font-weight: 700; font-size: 1.7rem; margin: .5rem 0 .1rem; letter-spacing: -.02em; }
+  .tier .price small { font-size: .82rem; color: var(--ink-faint); font-weight: 400; letter-spacing: 0; }
+  .tier ul { list-style: none; padding: 0; margin: 1rem 0 1.5rem; display: flex; flex-direction: column; gap: .6rem; }
+  .tier li { position: relative; padding-left: 1.5ch; color: var(--ink-soft); font-size: .96rem; }
+  .tier li::before { content: "+"; position: absolute; left: 0; color: var(--good); font-family: var(--font-mono); font-weight: 700; }
+  .tier .btn { margin-top: auto; justify-content: center; }
+
+  /* ---------- footer ---------- */
+  footer { border-top: 1px solid var(--line); background: var(--surface); }
+  .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.5rem; padding-block: 2.6rem; }
+  .foot .col h4 { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 .8rem; }
+  .foot a { display: block; font-family: var(--font-mono); font-size: .86rem; color: var(--ink-soft); text-decoration: none; margin-bottom: .5rem; }
+  .foot a:hover { color: var(--accent); }
+  .foot .brandcol { max-width: 34ch; }
+  .foot .brandcol p { font-size: .9rem; color: var(--ink-faint); margin: .5rem 0 0; }
+  .legal { border-top: 1px solid var(--line-soft); padding-block: 1.2rem; font-family: var(--font-mono); font-size: .74rem; color: var(--ink-faint); display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; justify-content: space-between; }
+
+  /* ---------- hero reveal (enhancement only) ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { opacity: 0; transform: translateY(14px); animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+    .reveal.d1 { animation-delay: .05s; }
+    .reveal.d2 { animation-delay: .16s; }
+    .reveal.d3 { animation-delay: .27s; }
+    .reveal.d4 { animation-delay: .40s; }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="tick">▍</span>jrs</a>
+    <nav class="links">
+      <a class="hide-sm" href="#evidence">Field test</a>
+      <a class="hide-sm" href="#how">How it works</a>
+      <a class="hide-sm" href="#pricing">Pricing</a>
+      <button class="toggle" id="themeToggle" type="button" aria-label="Toggle color theme">theme</button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="pad">
+    <div class="wrap hero">
+      <div>
+        <p class="eyebrow reveal d1">Java Review Swarm · multi-perspective review for Spring &amp; the JVM</p>
+        <h1 class="reveal d1">The Java reviewer that tries to prove itself wrong.</h1>
+        <p class="deck reveal d2">Eight specialist reviewers read your diff in parallel. Then every finding is
+          cross-examined against the real code by a skeptic whose only job is to refute it.
+          The ones that don't survive never reach you.</p>
+        <div class="cta-row reveal d3">
+          <a class="btn primary" href="https://qgambit2.github.io/java-review-results/">Read the field test →</a>
+          <a class="btn ghost" href="mailto:eugenebendersky5@gmail.com?subject=java-review%20commercial%20license">Commercial licensing</a>
+        </div>
+        <p class="fine reveal d3">Free for non-commercial use · Runs inside Claude Code — your code never leaves your environment.</p>
+      </div>
+
+      <div class="card reveal d4" role="img" aria-label="Example review output: an APPROVE WITH CONCERNS verdict with one verified MEDIUM performance finding and two findings struck through as refuted by the verifier.">
+        <div class="bar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="cmd">jrs · pulsar #26117</span>
+        </div>
+        <div class="body">
+          <div class="verdict concern">💬 APPROVE WITH CONCERNS</div>
+          <div class="subtle" style="margin:.25rem 0 .5rem;">1 verified · 2 refuted by cross-examination</div>
+
+          <div class="finding">
+            <span class="chip med">MEDIUM</span> <span class="slug">performance / hot-path-alloc</span>
+            <div class="fbody">Builds a full removal set on every ack — O(n) allocation on a hot path.
+              <span class="vnote">Confirmed across 3 call sites.</span></div>
+          </div>
+
+          <div class="finding refuted">
+            <span class="chip ref">⟂ REFUTED</span> <span class="slug">data / upgrade-data-loss</span>
+            <div class="fbody"><span class="fttl">bitmap format breaks on rolling upgrade</span>
+              <div class="vnote">verifier: old readers ignore the new field.</div></div>
+          </div>
+
+          <div class="finding refuted">
+            <span class="chip ref">⟂ REFUTED</span> <span class="slug">concurrency / ack-atomicity-race</span>
+            <div class="fbody"><span class="fttl">lost update under concurrent acks</span>
+              <div class="vnote">verifier: guarded by the cursor lock.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIFFERENTIATION -->
+  <section class="pad">
+    <div class="wrap">
+      <p class="eyebrow">Why it's different</p>
+      <h2 class="sec">Most AI reviewers hand you a wall of maybes. This one hands you a verdict.</h2>
+      <p class="lede">Noise is the reason review bots get muted. JRS is built to earn the opposite reflex —
+        when it flags something, it has already tried to talk itself out of it.</p>
+
+      <div class="cols3">
+        <div class="pillar">
+          <span class="n">01 / DEPTH</span>
+          <h3>Java-native, not language-agnostic</h3>
+          <p>It knows JPA proxy self-invocation, EAGER-by-default to-ones, expand/contract migration safety,
+            virtual-thread pinning, and <span class="mono">@Transactional</span> scope — the pitfalls a
+            generic linter has never heard of.</p>
+        </div>
+        <div class="pillar">
+          <span class="n">02 / RIGOR</span>
+          <h3>Verified findings only</h3>
+          <p>Every gating finding is refutation-tested against the real code before you see it. Agreement between
+            reviewers raises priority but never counts as proof — same-model reviewers hallucinate together.</p>
+        </div>
+        <div class="pillar">
+          <span class="n">03 / CLARITY</span>
+          <h3>A gate, not a pile</h3>
+          <p>One call over only the findings that survived: 🚫 Blocked · ⚠️ Request changes · 💬 Approve with
+            concerns · ✅ Looks good. Design and style opinions inform — they never block a merge.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVIDENCE -->
+  <section class="pad" id="evidence">
+    <div class="wrap">
+      <p class="eyebrow">Field test — seven unseen PRs from Apache &amp; Halo</p>
+      <h2 class="sec">We ran it on other people's code, and scored it against ourselves.</h2>
+      <p class="lede">Real pull requests the reviewers had never seen — DolphinScheduler, Halo, Dubbo,
+        ShardingSphere — plus four large ones from Kafka, Pulsar, Flink, and Druid. Hand-scored, conservatively.</p>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="num good">2<span class="unit"> / 2</span></div>
+          <div class="lab">reintroduced bugs caught — a concurrency HIGH and an IDOR CRITICAL, both verifier-confirmed</div>
+        </div>
+        <div class="stat">
+          <div class="num good">0</div>
+          <div class="lab">false positives across five clean merged PRs — all ✅ LOOKS GOOD, reproduced on a second run</div>
+        </div>
+        <div class="stat">
+          <div class="num">5,748<span class="unit"> ln</span></div>
+          <div class="lab">largest PR reviewed whole — 64 files across 3 modules (Apache Druid)</div>
+        </div>
+        <div class="stat">
+          <div class="num">8<span class="unit"> ×</span></div>
+          <div class="lab">specialist reviewers + adversarial verification, ~2M tokens on a deep run</div>
+        </div>
+      </div>
+
+      <p class="callout"><strong>Read the caveats, they're the point.</strong> N is small — seven PRs. This is an
+        existence result, not a rate, and borderline findings were scored as false positives on purpose. The full
+        methodology and every per-PR verdict are public: <a href="https://qgambit2.github.io/java-review-results/">see the complete field-test results →</a></p>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="pad" id="how">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h2 class="sec">Fan out. Fold. Cross-examine. Gate.</h2>
+      <p class="lede">A pipeline, not a single prompt — so a bad finding has to get past a skeptic, and no lone
+        agent can swing the verdict.</p>
+
+      <div class="pipe">
+        <div class="stage">
+          <span class="step">01 · FAN OUT</span>
+          <h3>Eight independent specialists</h3>
+          <p>Correctness, concurrency, security, persistence, API &amp; ops, performance — each reviews the diff in
+            parallel, and none knows the others exist. Convergence means something only when it's uncoordinated.</p>
+        </div>
+        <div class="stage">
+          <span class="step">02 · FOLD</span>
+          <h3>Merge the duplicates</h3>
+          <p>When several reviewers land on the same defect, it's folded into one finding that keeps every angle —
+            so a single fix-site gates once, not five times.</p>
+        </div>
+        <div class="stage">
+          <span class="step">03 · CROSS-EXAMINE</span>
+          <h3>A skeptic tries to refute it</h3>
+          <p>Each finding faces a verifier that hunts for the guard, the config, the caller-side check that makes
+            it a false alarm. Killing or minting a verdict-deciding call takes a 2-of-3 panel.</p>
+        </div>
+        <div class="stage">
+          <span class="step">04 · GATE</span>
+          <h3>One verdict, only the survivors</h3>
+          <p>A single gated call over the confirmed findings the diff actually introduced. Everything unverified
+            is labeled as such and kept out of the gate — never silently dropped.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY / FIT -->
+  <section class="pad">
+    <div class="wrap">
+      <p class="eyebrow">Built for the reviewer</p>
+      <h2 class="sec">Made for Java teams that take review seriously.</h2>
+      <div class="why">
+        <div class="item">
+          <h3>Your code stays put</h3>
+          <p>Runs inside Claude Code, in your own environment — no third-party service, no new data processor to
+            get through security. The difference between a <span class="mono">git clone</span> and a procurement cycle.</p>
+        </div>
+        <div class="item">
+          <h3>Report-first, never trigger-happy</h3>
+          <p>The default deliverable is a report with paste-ready comments. It posts to a PR only when you ask,
+            always as a comment — never an automated approve or block. Humans decide merges.</p>
+        </div>
+        <div class="item">
+          <h3>It compounds with your outages</h3>
+          <p>Feed it your team's postmortems and house conventions; they become failure patterns and repo-specific
+            rules the reviewers apply on every future run.</p>
+        </div>
+        <div class="item">
+          <h3>Three tools, one brain</h3>
+          <p>A full swarm review, a quick single-specialist inline pass, and a delta re-review that checks whether
+            an author addressed your last round — sharing one set of Java reviewer briefs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pad" id="pricing">
+    <div class="wrap">
+      <p class="eyebrow">Licensing</p>
+      <h2 class="sec">Free to evaluate. Fair to run a business on.</h2>
+      <p class="lede">Source-available under PolyForm Noncommercial — read it, run it, fork it. Commercial use
+        is a separate license.</p>
+
+      <div class="tiers">
+        <div class="tier">
+          <span class="kind">Non-commercial</span>
+          <div class="price">Free</div>
+          <ul>
+            <li>Full capability — all eight reviewers and verification</li>
+            <li>Personal projects, research, education, evaluation</li>
+            <li>Use by non-profit &amp; government organizations</li>
+            <li>Source-available under PolyForm Noncommercial 1.0.0</li>
+          </ul>
+          <a class="btn ghost" href="https://qgambit2.github.io/java-review-results/">See what it finds →</a>
+        </div>
+        <div class="tier feat">
+          <span class="kind">Commercial</span>
+          <div class="price">Per team <small>· let's talk</small></div>
+          <ul>
+            <li>Commercial-use license for for-profit work</li>
+            <li>Reviewing company code, in your engineering process</li>
+            <li>Priority on new failure patterns &amp; Java-version support</li>
+            <li>Optional onboarding of your own postmortems</li>
+          </ul>
+          <a class="btn primary" href="mailto:eugenebendersky5@gmail.com?subject=java-review%20commercial%20license">Get a commercial license</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div class="col brandcol">
+      <a class="brand" href="#top"><span class="tick">▍</span>jrs</a>
+      <p>Java Review Swarm — multi-perspective Java code review with adversarial verification, as a Claude Code plugin.</p>
+    </div>
+    <div class="col">
+      <h4>Product</h4>
+      <a href="#evidence">Field-test results</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Licensing</a>
+    </div>
+    <div class="col">
+      <h4>Get it</h4>
+      <a href="https://github.com/qgambit2/java-review">GitHub repository</a>
+      <a href="https://qgambit2.github.io/java-review-results/">Performance &amp; methodology</a>
+      <a href="mailto:eugenebendersky5@gmail.com?subject=java-review%20commercial%20license">Commercial enquiries</a>
+    </div>
+  </div>
+  <div class="wrap legal">
+    <span>© <span id="yr">2026</span> Eugene Bendersky</span>
+    <span>v0.19.0+ source-available under PolyForm Noncommercial 1.0.0 · ≤ v0.18.2 released under MIT</span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var KEY = "jrs-theme";
+    try {
+      var saved = localStorage.getItem(KEY);
+      if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved);
+    } catch (e) {}
+    function current() {
+      var explicit = root.getAttribute("data-theme");
+      if (explicit) return explicit;
+      return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    var btn = document.getElementById("themeToggle");
+    if (btn) btn.addEventListener("click", function () {
+      var next = current() === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+    });
+    var yr = document.getElementById("yr");
+    if (yr) yr.textContent = new Date().getFullYear();
+  })();
+</script>
+
+</body>
+</html>
