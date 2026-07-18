@@ -331,10 +331,10 @@
           cross-examined against the real code by a skeptic whose only job is to refute it.
           The ones that don't survive never reach you.</p>
         <div class="cta-row reveal d3">
-          <a class="btn primary" href="https://qgambit2.github.io/java-review-results/">Read the field test →</a>
-          <a class="btn ghost" href="mailto:eugenebendersky5@gmail.com?subject=java-review%20commercial%20license">Commercial licensing</a>
+          <a class="btn primary" href="mailto:eugenebendersky5@gmail.com?subject=JRS%20trial%20access&amp;body=GitHub%20username%3A%20%0ATeam%20%2F%20intended%20use%20(optional)%3A%20">Request trial access</a>
+          <a class="btn ghost" href="https://qgambit2.github.io/java-review-results/">Read the field test →</a>
         </div>
-        <p class="fine reveal d3">Free for non-commercial use · Runs inside Claude Code — your code never leaves your environment.</p>
+        <p class="fine reveal d3">Free for non-commercial use · Source access by request — replies within a day · Runs inside Claude Code, your code never leaves your environment.</p>
       </div>
 
       <div class="card reveal d4" role="img" aria-label="Example review output: an APPROVE WITH CONCERNS verdict with one verified MEDIUM performance finding and two findings struck through as refuted by the verifier.">
@@ -422,23 +422,25 @@
   <!-- EVIDENCE -->
   <section class="pad" id="evidence">
     <div class="wrap">
-      <p class="eyebrow">Field test — seven unseen PRs from Apache &amp; Halo</p>
-      <h2 class="sec">We ran it on other people's code, and scored it against ourselves.</h2>
-      <p class="lede">Real pull requests the reviewers had never seen — DolphinScheduler, Halo, Dubbo,
-        ShardingSphere — plus four large ones from Kafka, Pulsar, Flink, and Druid. Hand-scored, conservatively.</p>
+      <p class="eyebrow">Field test — real PRs from Apache, Netty &amp; Halo</p>
+      <h2 class="sec">We ran it on other people's code, and scored it against the maintainers.</h2>
+      <p class="lede">Seven unseen pull requests — DolphinScheduler, Halo, Dubbo, ShardingSphere, plus large ones
+        from Kafka, Pulsar, Flink, and Druid — then seven <em>mined regression pairs</em>: PRs that introduced a
+        real bug the maintainers later fixed, replayed against the introducing PR. The world chose those bugs,
+        not us.</p>
 
       <div class="stats">
         <div class="stat">
-          <div class="num good">2<span class="unit"> / 2</span></div>
-          <div class="lab">reintroduced bugs caught — a concurrency HIGH and an IDOR CRITICAL, both verifier-confirmed</div>
+          <div class="num good">5<span class="unit"> / 7</span></div>
+          <div class="lab">maintainer-fixed regressions detected at the PR that introduced them — real Pulsar &amp; Netty production code</div>
         </div>
         <div class="stat">
           <div class="num good">0</div>
           <div class="lab">false positives across five clean merged PRs — all ✅ LOOKS GOOD, reproduced on a second run</div>
         </div>
         <div class="stat">
-          <div class="num">5,748<span class="unit"> ln</span></div>
-          <div class="lab">largest PR reviewed whole — 64 files across 3 modules (Apache Druid)</div>
+          <div class="num good">0</div>
+          <div class="lab">fabricated findings across all seven regression-pair runs on real production code</div>
         </div>
         <div class="stat">
           <div class="num">8<span class="unit"> ×</span></div>
@@ -446,9 +448,14 @@
         </div>
       </div>
 
-      <p class="callout"><strong>Read the caveats, they're the point.</strong> N is small — seven PRs. This is an
-        existence result, not a rate, and borderline findings were scored as false positives on purpose. The full
-        methodology and every per-PR verdict are public: <a href="https://qgambit2.github.io/java-review-results/">see the complete field-test results →</a></p>
+      <p class="callout"><strong>Read the caveats, they're the point.</strong> N is small, this is an existence
+        result, not a rate; borderline findings were scored as false positives on purpose, and of the five
+        regressions caught, two were initially under-rated in severity (both drove shipped calibration fixes).
+        On four of the seven pairs it also surfaced defects deeper than the maintainers' shipped fix — those are
+        code-verified but not maintainer-adjudicated, so we don't put them in the headline.
+        The field-test methodology and every per-PR verdict are public:
+        <a href="https://qgambit2.github.io/java-review-results/">see the complete field-test results →</a>
+        The regression-pair run artifacts ship in the repo — ask for access and audit them offline.</p>
     </div>
   </section>
 
@@ -524,8 +531,8 @@
     <div class="wrap">
       <p class="eyebrow">Licensing</p>
       <h2 class="sec">Free to evaluate. Fair to run a business on.</h2>
-      <p class="lede">Source-available under PolyForm Noncommercial — read it, run it, fork it. Commercial use
-        is a separate license.</p>
+      <p class="lede">Source-available under PolyForm Noncommercial — access by request, then read it, run it,
+        audit every prompt it sends. Commercial use is a separate license.</p>
 
       <div class="tiers">
         <div class="tier">
@@ -535,13 +542,13 @@
             <li>Full capability — all eight reviewers and verification</li>
             <li>Personal projects, research, education, evaluation</li>
             <li>Use by non-profit &amp; government organizations</li>
-            <li>Source-available under PolyForm Noncommercial 1.0.0</li>
+            <li>Source access by request · PolyForm Noncommercial 1.0.0</li>
           </ul>
-          <a class="btn ghost" href="https://qgambit2.github.io/java-review-results/">See what it finds →</a>
+          <a class="btn ghost" href="mailto:eugenebendersky5@gmail.com?subject=JRS%20trial%20access&amp;body=GitHub%20username%3A%20%0ATeam%20%2F%20intended%20use%20(optional)%3A%20">Request trial access</a>
         </div>
         <div class="tier feat">
           <span class="kind">Commercial</span>
-          <div class="price">Per team <small>· let's talk</small></div>
+          <div class="price">From $300 <small>/ team / month, billed annually</small></div>
           <ul>
             <li>Commercial-use license for for-profit work</li>
             <li>Reviewing company code, in your engineering process</li>
@@ -551,6 +558,12 @@
           <a class="btn primary" href="mailto:eugenebendersky5@gmail.com?subject=java-review%20commercial%20license">Get a commercial license</a>
         </div>
       </div>
+
+      <p class="callout"><strong>Design partners wanted.</strong> The first few teams that run JRS on their real
+        pull requests get six months of commercial use free, in exchange for a short monthly report — what it
+        flagged wrongly, what it missed, whether the verdicts earned trust. Your postmortems become failure
+        patterns; your false positives make the verifier stricter.
+        <a href="mailto:eugenebendersky5@gmail.com?subject=JRS%20design%20partner">Become a design partner →</a></p>
     </div>
   </section>
 
@@ -570,7 +583,7 @@
     </div>
     <div class="col">
       <h4>Get it</h4>
-      <a href="https://github.com/qgambit2/java-review">GitHub repository</a>
+      <a href="mailto:eugenebendersky5@gmail.com?subject=JRS%20trial%20access&amp;body=GitHub%20username%3A%20%0ATeam%20%2F%20intended%20use%20(optional)%3A%20">Request trial access</a>
       <a href="https://qgambit2.github.io/java-review-results/">Performance &amp; methodology</a>
       <a href="mailto:eugenebendersky5@gmail.com?subject=java-review%20commercial%20license">Commercial enquiries</a>
     </div>
