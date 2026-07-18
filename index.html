@@ -425,14 +425,14 @@
       <p class="eyebrow">Field test — real PRs from Apache, Netty &amp; Halo</p>
       <h2 class="sec">We ran it on other people's code, and scored it against the maintainers.</h2>
       <p class="lede">Seven unseen pull requests — DolphinScheduler, Halo, Dubbo, ShardingSphere, plus large ones
-        from Kafka, Pulsar, Flink, and Druid — then ten <em>mined regression pairs</em>: PRs that introduced a
+        from Kafka, Pulsar, Flink, and Druid — then twenty <em>mined regression pairs</em>: PRs that introduced a
         real bug the maintainers later fixed, replayed against the introducing PR. The world chose those bugs,
         not us.</p>
 
       <div class="stats">
         <div class="stat">
-          <div class="num good">7<span class="unit"> / 10</span></div>
-          <div class="lab">maintainer-fixed regressions detected at the PR that introduced them — real Pulsar &amp; Netty production code</div>
+          <div class="num good">12<span class="unit"> / 20</span></div>
+          <div class="lab">maintainer-fixed regressions detected at the PR that introduced them — real Pulsar, Netty &amp; Elasticsearch production code</div>
         </div>
         <div class="stat">
           <div class="num good">0</div>
@@ -440,7 +440,7 @@
         </div>
         <div class="stat">
           <div class="num good">0</div>
-          <div class="lab">fabricated findings across all ten regression-pair runs on real production code</div>
+          <div class="lab">fabricated findings across all twenty regression-pair runs on real production code</div>
         </div>
         <div class="stat">
           <div class="num">8<span class="unit"> ×</span></div>
@@ -448,14 +448,16 @@
         </div>
       </div>
 
-      <p class="callout"><strong>Read the caveats, they're the point.</strong> N is small, this is an existence
-        result, not a rate; borderline findings were scored as false positives on purpose, and of the seven
-        regressions caught, two were initially under-rated in severity (both drove shipped calibration fixes).
-        One "missed" pair is stranger than a miss: the reviewers missed the mined target but independently
-        converged on a <em>second</em> maintainer-fixed regression in the same PR — so at defect level the
-        count is 8 of 12. On five of the ten pairs it also surfaced defects deeper than the maintainers'
-        shipped fix — those are
-        code-verified but not maintainer-adjudicated, so we don't put them in the headline.
+      <p class="callout"><strong>Read the caveats, they're the point.</strong> N is still modest and this is an
+        existence result, not a guaranteed rate; borderline findings were scored as false positives on purpose.
+        The honest pattern behind the 12/20: detection tracks how <em>directly</em> the bug sits on the changed
+        code. On-surface, pointable regressions — a wrong comparison, a missing release, an off-by-one that
+        throws — are caught reliably; subtle emergent ones (a reordered lock snapshot that only bites under a
+        concurrent thread, an omission of code that should have been there) are where the misses cluster, and
+        several of those still surfaced a <em>different</em> real bug in the same PR. Across all twenty runs:
+        zero fabricated findings. A few caught regressions were initially under-rated in severity — each drove
+        a shipped calibration fix. On several pairs it also surfaced defects deeper than the maintainers'
+        shipped fix — code-verified but not maintainer-adjudicated, so we keep them out of the headline.
         The field-test methodology and every per-PR verdict are public:
         <a href="https://qgambit2.github.io/java-review-results/">see the complete field-test results →</a>
         The regression-pair run artifacts ship in the repo — ask for access and audit them offline.</p>
