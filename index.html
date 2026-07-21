@@ -425,13 +425,13 @@
       <p class="eyebrow">Field test — real PRs from Apache, Netty &amp; Halo</p>
       <h2 class="sec">We ran it on other people's code, and scored it against the maintainers.</h2>
       <p class="lede">Seven unseen pull requests — DolphinScheduler, Halo, Dubbo, ShardingSphere, plus large ones
-        from Kafka, Pulsar, Flink, and Druid — then two hundred ninety <em>mined regression pairs</em>: PRs that introduced a
+        from Kafka, Pulsar, Flink, and Druid — then three hundred seventy <em>mined regression pairs</em>: PRs that introduced a
         real bug the maintainers later fixed, replayed against the introducing PR. The world chose those bugs,
         not us.</p>
 
       <div class="stats">
         <div class="stat">
-          <div class="num good">236<span class="unit"> / 290</span></div>
+          <div class="num good">301<span class="unit"> / 370</span></div>
           <div class="lab">maintainer-fixed regressions detected at the PR that introduced them — real Kafka, Pulsar, Flink, Hadoop, Lucene, Elasticsearch, Cassandra, Trino, Presto, Parquet, Keycloak, Solr, Avro, ORC, netty, Iceberg &amp; more production code</div>
         </div>
         <div class="stat">
@@ -441,7 +441,7 @@
         <div class="stat">
           <div class="num good">0</div>
           <div class="lab">fabricated findings across all one hundred sixty regression-pair runs on real production code</div>
-        <p class="fine" style="margin-top:.75rem;color:var(--muted);font-size:.88rem;">Finder model: n=1–70 <b>Opus 4.8</b>; n=71–290 <b>Grok 4.5</b> (220 pairs, 192/220 HIT). See the <a href="https://qgambit2.github.io/java-review-results/#pairs">results table</a> Model column.</p>
+        <p class="fine" style="margin-top:.75rem;color:var(--muted);font-size:.88rem;">Finder model: n=1–70 <b>Opus 4.8</b>; n=71–370 <b>Grok 4.5</b> (300 pairs). See the <a href="https://qgambit2.github.io/java-review-results/#pairs">results table</a> Model column.</p>
         </div>
         <div class="stat">
           <div class="num">8<span class="unit"> ×</span></div>
@@ -451,7 +451,7 @@
 
       <p class="callout"><strong>Read the caveats, they're the point.</strong> N is still modest and this is an
         existence result, not a guaranteed rate; borderline findings were scored as false positives on purpose.
-        The honest pattern behind the 236/290: detection tracks how <em>directly</em> the bug sits on the changed
+        The honest pattern behind the 301/370: detection tracks how <em>directly</em> the bug sits on the changed
         code. On-surface, pointable regressions — a wrong comparison, a missing release, an off-by-one that
         throws, a downgraded auth check, a self-deadlocking executor — are caught reliably, and so are subtle ones
         when the owning reviewer reads the out-of-diff helper it depends on (a config path that skips a default, a
