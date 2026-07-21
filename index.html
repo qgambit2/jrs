@@ -431,7 +431,7 @@
 
       <div class="stats">
         <div class="stat">
-          <div class="num good">301<span class="unit"> / 370</span></div>
+          <div class="num good">285<span class="unit"> / 370</span></div>
           <div class="lab">maintainer-fixed regressions detected at the PR that introduced them — real Kafka, Pulsar, Flink, Hadoop, Lucene, Elasticsearch, Cassandra, Trino, Presto, Parquet, Keycloak, Solr, Avro, ORC, netty, Iceberg &amp; more production code</div>
         </div>
         <div class="stat">
@@ -440,7 +440,7 @@
         </div>
         <div class="stat">
           <div class="num good">0</div>
-          <div class="lab">fabricated findings across all one hundred sixty regression-pair runs on real production code</div>
+          <div class="lab">fabricated findings across all three hundred seventy regression-pair runs on real production code</div>
         <p class="fine" style="margin-top:.75rem;color:var(--muted);font-size:.88rem;">Finder model: n=1–70 <b>Opus 4.8</b>; n=71–370 <b>Grok 4.5</b> (300 pairs). See the <a href="https://qgambit2.github.io/java-review-results/#pairs">results table</a> Model column.</p>
         </div>
         <div class="stat">
@@ -458,7 +458,7 @@
         buffer persisted twice, an executor call that secretly blocks). The misses cluster in emergent cases (a
         swap that only bites after a failover, an edge case for one id type) and, most tellingly, where the bug's
         wrongness lives in a <em>different</em> file the diff never touches — and several misses still surfaced a
-        <em>different</em> real bug in the same PR. Across all one hundred sixty runs:
+        <em>different</em> real bug in the same PR. Across all three hundred seventy runs:
         zero fabricated findings. A few caught regressions were initially under-rated in severity — each drove
         a shipped calibration fix. On several pairs it also surfaced defects deeper than the maintainers'
         shipped fix — code-verified but not maintainer-adjudicated, so we keep them out of the headline.
