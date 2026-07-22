@@ -441,7 +441,7 @@
         <div class="stat">
           <div class="num good">0</div>
           <div class="lab">fabricated findings across all five hundred eighty regression-pair runs on real production code</div>
-        <p class="fine" style="margin-top:.75rem;color:var(--muted);font-size:.88rem;">Finder model: Opus 4.8 n=1–70 <b>44/70 (63%)</b>; Grok 4.5 n=71–630 <b>404/560 (72%)</b>; total <b>448/630 (71%)</b>. See the <a href="https://qgambit2.github.io/java-review-results/#pairs">results table</a> Model column.</p>
+        <p class="fine" style="margin-top:.75rem;color:var(--muted);font-size:.88rem;">Finder model: Opus 4.8 n=1–70 <b>44/70 (63%)</b>; Grok 4.5 n=71–630 <b>406/560 (72%)</b>; total <b>450/630 (71%)</b>. See the <a href="https://qgambit2.github.io/java-review-results/#pairs">results table</a> Model column.</p>
         </div>
         <div class="stat">
           <div class="num">8<span class="unit"> ×</span></div>
@@ -452,7 +452,7 @@
       <p class="callout"><strong>Read the caveats, they're the point.</strong> N is large enough to be informative, but this is still an
         existence / tripwire result, not a guaranteed rate — the sample is adversarially selected toward weak lanes and harder surfaces;
         borderline findings were scored as false positives on purpose.
-        The honest pattern behind the 448/630: detection tracks how <em>directly</em> the bug sits on the changed
+        The honest pattern behind the 450/630: detection tracks how <em>directly</em> the bug sits on the changed
         code. On-surface, pointable regressions — a wrong comparison, a missing release, an off-by-one that
         throws, a downgraded auth check, a self-deadlocking executor — are caught reliably, and so are subtle ones
         when the owning reviewer reads the out-of-diff helper it depends on (a config path that skips a default, a
