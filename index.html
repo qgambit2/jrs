@@ -449,8 +449,9 @@
         </div>
       </div>
 
-      <p class="callout"><strong>Read the caveats, they're the point.</strong> N is still modest and this is an
-        existence result, not a guaranteed rate; borderline findings were scored as false positives on purpose.
+      <p class="callout"><strong>Read the caveats, they're the point.</strong> N is large enough to be informative, but this is still an
+        existence / tripwire result, not a guaranteed rate — the sample is adversarially selected toward weak lanes and harder surfaces;
+        borderline findings were scored as false positives on purpose.
         The honest pattern behind the 348/470: detection tracks how <em>directly</em> the bug sits on the changed
         code. On-surface, pointable regressions — a wrong comparison, a missing release, an off-by-one that
         throws, a downgraded auth check, a self-deadlocking executor — are caught reliably, and so are subtle ones
