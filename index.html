@@ -431,7 +431,7 @@
 
       <div class="stats">
         <div class="stat">
-          <div class="num good">454<span class="unit"> / 630</span></div>
+          <div class="num good">440<span class="unit"> / 630</span></div>
           <div class="lab">maintainer-fixed regressions detected at the PR that introduced them — real Kafka, Pulsar, Flink, Hadoop, Lucene, Elasticsearch, Cassandra, Trino, Presto, Parquet, Keycloak, Solr, Avro, ORC, netty, Iceberg &amp; more production code</div>
         </div>
         <div class="stat">
@@ -441,7 +441,7 @@
         <div class="stat">
           <div class="num good">0</div>
           <div class="lab">fabricated findings across all six hundred thirty regression-pair runs on real production code</div>
-        <p class="fine" style="margin-top:.75rem;color:var(--muted);font-size:.88rem;">Finder model: Opus 4.8 n=1–70 <b>44/70 (63%)</b>; Grok 4.5 n=71–630 <b>410/560 (73%)</b>; total <b>454/630 (72%)</b>. See the <a href="https://qgambit2.github.io/java-review-results/#pairs">results table</a> Model column.</p>
+        <p class="fine" style="margin-top:.75rem;color:var(--muted);font-size:.88rem;">Finder model: Opus 4.8 n=1–70 <b>44/70 (63%)</b>; Grok 4.5 n=71–630 <b>396/560 (71%)</b>; total <b>440/630 (70%)</b>. See the <a href="https://qgambit2.github.io/java-review-results/#pairs">results table</a> Model column.</p>
         </div>
         <div class="stat">
           <div class="num">8<span class="unit"> ×</span></div>
@@ -452,7 +452,7 @@
       <p class="callout"><strong>Read the caveats, they're the point.</strong> N is large enough to be informative, but this is still an
         existence / tripwire result, not a guaranteed rate — the sample is adversarially selected toward weak lanes and harder surfaces;
         borderline findings were scored as false positives on purpose.
-        The honest pattern behind the 454/630: detection tracks how <em>directly</em> the bug sits on the changed
+        The honest pattern behind the 440/630: detection tracks how <em>directly</em> the bug sits on the changed
         code. On-surface, pointable regressions — a wrong comparison, a missing release, an off-by-one that
         throws, a downgraded auth check, a self-deadlocking executor — are caught reliably, and so are subtle ones
         when the owning reviewer reads the out-of-diff helper it depends on (a config path that skips a default, a
