@@ -425,7 +425,7 @@
       <p class="eyebrow">Field test — real PRs from Apache, Netty &amp; Halo</p>
       <h2 class="sec">We ran it on other people's code, and scored it against the maintainers.</h2>
       <p class="lede">Seven unseen pull requests — DolphinScheduler, Halo, Dubbo, ShardingSphere, plus large ones
-        from Kafka, Pulsar, Flink, and Druid — then six hundred thirty <em>mined regression pairs</em>: PRs that introduced a
+        from Kafka, Pulsar, Flink, and Druid — then seven hundred eighty <em>mined regression pairs</em>: PRs that introduced a
         real bug the maintainers later fixed, replayed against the introducing PR. The world chose those bugs,
         not us.</p>
 
@@ -440,7 +440,7 @@
         </div>
         <div class="stat">
           <div class="num good">0</div>
-          <div class="lab">fabricated findings across all six hundred thirty regression-pair runs on real production code</div>
+          <div class="lab">fabricated findings across all seven hundred eighty regression-pair runs on real production code</div>
         <p class="fine" style="margin-top:.75rem;color:var(--muted);font-size:.88rem;">Finder model: Opus 4.8 n=1–70 <b>44/70 (63%)</b>; Grok 4.5 n=71–780 <b>491/710 (69%)</b>; total <b>535/780 (69%)</b>. See the <a href="https://qgambit2.github.io/java-review-results/#pairs">results table</a> Model column.</p>
         </div>
         <div class="stat">
@@ -459,7 +459,7 @@
         buffer persisted twice, an executor call that secretly blocks). The misses cluster in emergent cases (a
         swap that only bites after a failover, an edge case for one id type) and, most tellingly, where the bug's
         wrongness lives in a <em>different</em> file the diff never touches — and several misses still surfaced a
-        <em>different</em> real bug in the same PR. Across all six hundred thirty runs:
+        <em>different</em> real bug in the same PR. Across all seven hundred eighty runs:
         zero fabricated findings. A few caught regressions were initially under-rated in severity — each drove
         a shipped calibration fix. On several pairs it also surfaced defects deeper than the maintainers'
         shipped fix — code-verified but not maintainer-adjudicated, so we keep them out of the headline.
