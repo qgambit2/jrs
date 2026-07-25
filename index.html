@@ -459,7 +459,12 @@
         buffer persisted twice, an executor call that secretly blocks). The misses cluster in emergent cases (a
         swap that only bites after a failover, an edge case for one id type) and, most tellingly, where the bug's
         wrongness lives in a <em>different</em> file the diff never touches — and several misses still surfaced a
-        <em>different</em> real bug in the same PR. Across all eight hundred ninety runs:
+        <em>different</em> real bug in the same PR. That last class is now measured rather than asserted: a
+        mechanical screen of both diffs across all 890 pairs finds <b>28% of the misses are not clean in-diff
+        tests</b> (against 16% of the hits), and on the pairs where the defect <em>is</em> on the shown surface
+        recall is <b>486/707 = 68.7%</b>. Nothing was deleted to get there — dropping the 3 provably-invalid pairs
+        moves the headline 65.4% → 65.5%. Full split:
+        <a href="https://qgambit2.github.io/java-review-results/#attribution">recall by attribution stratum</a>. Across all eight hundred ninety runs:
         zero fabricated findings. A few caught regressions were initially under-rated in severity — each drove
         a shipped calibration fix. On several pairs it also surfaced defects deeper than the maintainers'
         shipped fix — code-verified but not maintainer-adjudicated, so we keep them out of the headline.
