@@ -425,13 +425,13 @@
       <p class="eyebrow">Field test — real PRs from Apache, Netty &amp; Halo</p>
       <h2 class="sec">We ran it on other people's code, and scored it against the maintainers.</h2>
       <p class="lede">Seven unseen pull requests — DolphinScheduler, Halo, Dubbo, ShardingSphere, plus large ones
-        from Kafka, Pulsar, Flink, and Druid — then eight hundred ninety <em>mined regression pairs</em>: PRs that introduced a
+        from Kafka, Pulsar, Flink, and Druid — then eight hundred eighty-seven <em>mined regression pairs</em>: PRs that introduced a
         real bug the maintainers later fixed, replayed against the introducing PR. The world chose those bugs,
         not us.</p>
 
       <div class="stats">
         <div class="stat">
-          <div class="num good">582<span class="unit"> / 890</span></div>
+          <div class="num good">581<span class="unit"> / 887</span></div>
           <div class="lab">maintainer-fixed regressions detected at the PR that introduced them — real Kafka, Pulsar, Flink, Hadoop, Lucene, Elasticsearch, Cassandra, Trino, Presto, Parquet, Keycloak, Solr, Avro, ORC, netty, Iceberg &amp; more production code</div>
         </div>
         <div class="stat">
@@ -440,8 +440,8 @@
         </div>
         <div class="stat">
           <div class="num good">0</div>
-          <div class="lab">fabricated findings across all eight hundred ninety regression-pair runs on real production code</div>
-        <p class="fine" style="margin-top:.75rem;color:var(--muted);font-size:.88rem;">Finder model: Opus 4.8 n=1–70 <b>44/70 (63%)</b>; Grok 4.5 n=71–890 <b>538/820 (66%)</b>; total <b>582/890 (65%)</b>. See the <a href="https://qgambit2.github.io/java-review-results/#pairs">results table</a> Model column.</p>
+          <div class="lab">fabricated findings across all eight hundred eighty-seven regression-pair runs on real production code</div>
+        <p class="fine" style="margin-top:.75rem;color:var(--muted);font-size:.88rem;">Finder model: Opus 4.8 n=1–70 <b>44/70 (63%)</b>; Grok 4.5 n=71–890 <b>537/817 (66%)</b>; total <b>581/887 (65%)</b>. See the <a href="https://qgambit2.github.io/java-review-results/#pairs">results table</a> Model column.</p>
         </div>
         <div class="stat">
           <div class="num">8<span class="unit"> ×</span></div>
@@ -452,7 +452,7 @@
       <p class="callout"><strong>Read the caveats, they're the point.</strong> N is large enough to be informative, but this is still an
         existence / tripwire result, not a guaranteed rate — the sample is adversarially selected toward weak lanes and harder surfaces;
         borderline findings were scored as false positives on purpose.
-        The honest pattern behind the 582/890: detection tracks how <em>directly</em> the bug sits on the changed
+        The honest pattern behind the 581/887: detection tracks how <em>directly</em> the bug sits on the changed
         code. On-surface, pointable regressions — a wrong comparison, a missing release, an off-by-one that
         throws, a downgraded auth check, a self-deadlocking executor — are caught reliably, and so are subtle ones
         when the owning reviewer reads the out-of-diff helper it depends on (a config path that skips a default, a
@@ -460,11 +460,13 @@
         swap that only bites after a failover, an edge case for one id type) and, most tellingly, where the bug's
         wrongness lives in a <em>different</em> file the diff never touches — and several misses still surfaced a
         <em>different</em> real bug in the same PR. That last class is now measured rather than asserted: a
-        mechanical screen of both diffs across all 890 pairs finds <b>28% of the misses are not clean in-diff
+        mechanical screen of both diffs across every pair finds <b>28% of the misses are not clean in-diff
         tests</b> (against 16% of the hits), and on the pairs where the defect <em>is</em> on the shown surface
-        recall is <b>486/707 = 68.7%</b>. Nothing was deleted to get there — dropping the 3 provably-invalid pairs
-        moves the headline 65.4% → 65.5%. Full split:
-        <a href="https://qgambit2.github.io/java-review-results/#attribution">recall by attribution stratum</a>. Across all eight hundred ninety runs:
+        recall is <b>486/707 = 68.7%</b>. Only 3 pairs were provably invalid — one fix branched before its intro merged, one bank named the
+        same PR as both intro and fix, one fix merged seven weeks <em>before</em> its intro — and those were
+        removed from both sides, taking the corpus 890 → 887 and the headline 65.4% → 65.5%. Nothing else
+        was deleted. Full split:
+        <a href="https://qgambit2.github.io/java-review-results/#attribution">recall by attribution stratum</a>. Across all eight hundred eighty-seven runs:
         zero fabricated findings. A few caught regressions were initially under-rated in severity — each drove
         a shipped calibration fix. On several pairs it also surfaced defects deeper than the maintainers'
         shipped fix — code-verified but not maintainer-adjudicated, so we keep them out of the headline.
